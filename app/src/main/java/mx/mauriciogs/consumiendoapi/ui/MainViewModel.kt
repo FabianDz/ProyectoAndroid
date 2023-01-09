@@ -12,7 +12,7 @@ import mx.mauriciogs.consumiendoapi.domain.model.Characters
 class MainViewModel : ViewModel() {
 
     private val characterUseCase: CharacterUseCase = CharacterUseCase()
-
+    var numPag = 1
     private val _showError = MutableLiveData<String>()
     val showError : LiveData<String>
         get() = _showError
@@ -25,22 +25,29 @@ class MainViewModel : ViewModel() {
 
     // **** Crear un par de variables que sirvan para enviar una lista de personajes
     //      al MainActivity que posteriormente sirva para el RecyclerView
+    lateinit var listChar: ArrayList<Characters>
 
     // **** Modifica esta función para que ahora se pase toda la lista de personajes a la nueva
     //      variable creada que servirá para el RecyclerView
-    fun getAllCharacter(page: Int) {
+    fun getAllCharacter() {
         // Esta función obtiene todos los personajes de una página de manera asíncrona
         // y actualiza la variable _anyCharacter con el personaje 0
+
         viewModelScope.launch {
-            when (val result = characterUseCase.getAllCharacter(page)) {
+            when (val result = characterUseCase.getAllCharacter(numPag)) {
                 is ResultState.Success -> {
-                    _anyCharacter.postValue(result.data[0])
+                    //_anyCharacter.postValue(result.data[0]) // Del 0 al 19
+                    for (i in 0..19){
+                        listChar.add(result[i])
+                    }
+                    numPag++
                     //obtainedCharacters(result.data)
                 }
                 is ResultState.Error -> gotAnError(result.message)
             }
         }
     }
+
 
     // Crear una función que me obtenga un personaje por ID de manera asíncrona utilizando una
     // función del caso de uso de personajes, luego pasar el personaje obtenido a la variable _anyCharacer
